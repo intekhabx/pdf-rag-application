@@ -3,8 +3,9 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ClerkProvider, Show, SignIn, UserButton } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/theme-toggle";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,16 +40,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           inter.variable,
         )}
       >
-        <body className="min-h-full flex flex-col">
+        <body className="flex min-h-dvh flex-col">
           <Show when="signed-out">
             <div className="flex justify-center items-center min-h-screen">
               <SignIn />
             </div>
           </Show>
           <Show when="signed-in">
-            <header className="flex items-center justify-around p-4 border-b border-slate-500 sticky">
-              <h1 className="font-semibold">PDF-RAG</h1>
-              <UserButton />
+            <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
+              <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-3 py-3 sm:px-4 md:px-6">
+                <h1 className="font-semibold">PDF-RAG</h1>
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  <UserButton />
+                </div>
+              </div>
             </header>
           </Show>
           {children}

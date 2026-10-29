@@ -7,6 +7,16 @@ export interface SourceReference {
   chunkIndex: number;
 }
 
+export interface ResponseDocsType {
+  id: string,
+  metadata: {
+    source: string,
+    loc: {
+      pageNumber: number
+    }
+  }
+}
+
 export interface ChatMessage {
   id: string;
   role: ChatRole;

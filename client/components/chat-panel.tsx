@@ -80,7 +80,7 @@ export function ChatPanel({ uploadedDocument }: ChatPanelProps) {
   };
 
   return (
-    <Card className="flex h-full flex-col">
+    <Card className="flex h-full min-h-0 flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Send className="size-5" />
@@ -88,11 +88,11 @@ export function ChatPanel({ uploadedDocument }: ChatPanelProps) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
         {/* Messages */}
         <div
           ref={scrollRef}
-          className="flex-1 space-y-4 overflow-y-auto pr-1"
+          className="chat-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto pr-1"
         >
           {messages.length === 0 && !isLoading ? (
             <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
