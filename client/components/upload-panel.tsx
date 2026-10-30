@@ -26,6 +26,7 @@ export function UploadPanel({ onUploadSuccess }: UploadPanelProps) {
 
   const [isDragging, setIsDragging] = React.useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
+  const [progressMessage, setProgressMessage] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
 
@@ -38,23 +39,27 @@ export function UploadPanel({ onUploadSuccess }: UploadPanelProps) {
         return;
       }
 
-      // Obtain Clerk session token
-      const token = await getToken();
-
       setIsUploading(true);
+      setProgressMessage("Uploading PDF...");
       setError(null);
       setSuccess(null);
 
       try {
-        const response = await uploadPdf(file, token ?? "");
+        const token = await getToken();
+        const response = await uploadPdf(file, token ?? "", (progress) => {
+          setProgressMessage(progress.message);
+        });
         setSuccess(`${response.message} - ${response.source}`);
         onUploadSuccess?.(response);
-      } 
-      catch {
-        setError("An error occurred while uploading the file. Please try again.");
-      } 
-      finally {
+      } catch (uploadError) {
+        setError(
+          uploadError instanceof Error
+            ? uploadError.message
+            : "An error occurred while uploading the file. Please try again.",
+        );
+      } finally {
         setIsUploading(false);
+        setProgressMessage(null);
       }
     },
     [getToken, onUploadSuccess],
@@ -118,7 +123,9 @@ export function UploadPanel({ onUploadSuccess }: UploadPanelProps) {
           {isUploading ? (
             <>
               <Loader2 className="size-10 animate-spin text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Processing PDF…</p>
+              <p className="text-sm text-muted-foreground">
+                {progressMessage ?? "Uploading PDF..."}
+              </p>
             </>
           ) : (
             <>

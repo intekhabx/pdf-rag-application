@@ -30,13 +30,13 @@ const worker = new Worker('file-upload-queue', async (job) => {
   ***/
 
 
-  // 1. PDF se text extract karo (page by page)
+  // step:1. PDF se text extract karo (page by page)
   const loader = new PDFLoader(fileData.path);
   const docs = await loader.load();
   // console.log(docs);
 
 
-  // 2. Text ko chunks mein split karo
+  // step:2. Text ko chunks mein split karo
   // const splitter = new RecursiveCharacterTextSplitter({
   //   chunkSize: 1000,
   //   chunkOverlap: 200
@@ -47,8 +47,8 @@ const worker = new Worker('file-upload-queue', async (job) => {
   //? is liye mai textSplitter ka use nhi kr rha hun
 
 
-  // 3-4. Embeddings generate karo aur vector DB me store kro
-  (await vectorStore).addDocuments(docs);
+  // step:3-4. Embeddings generate karo aur vector DB me store kro
+  await (await vectorStore).addDocuments(docs);
 
   console.log("✅Embeddings stored in Qdrant successfully!");
 

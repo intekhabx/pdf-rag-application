@@ -32,6 +32,17 @@ export interface UploadSuccessResponse {
   source: string;
 }
 
+export type UploadProgressStatus =
+  | "queued"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export interface UploadProgress {
+  status: UploadProgressStatus;
+  message: string;
+}
+
 export interface ChatAnswerResponse {
   answer: string;
   sources: SourceReference[];

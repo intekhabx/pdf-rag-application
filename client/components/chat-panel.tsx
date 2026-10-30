@@ -6,7 +6,6 @@ import { AlertCircle, Loader2, Send } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { askQuestion } from "@/lib/api";
 import { validateQuestion, MAX_QUESTION_LENGTH } from "@/lib/validation";
@@ -24,6 +23,7 @@ export function ChatPanel({ uploadedDocument }: ChatPanelProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll to bottom on new messages
   React.useEffect(() => {
@@ -32,6 +32,26 @@ export function ChatPanel({ uploadedDocument }: ChatPanelProps) {
       behavior: "smooth",
     });
   }, [messages, isLoading]);
+
+  React.useLayoutEffect(() => {
+    const textarea = inputRef.current;
+    if (!textarea) return;
+
+    textarea.style.height = "auto";
+    const styles = window.getComputedStyle(textarea);
+    const lineHeight = Number.parseFloat(styles.lineHeight);
+    const verticalPadding =
+      Number.parseFloat(styles.paddingTop) +
+      Number.parseFloat(styles.paddingBottom);
+    const verticalBorder =
+      Number.parseFloat(styles.borderTopWidth) +
+      Number.parseFloat(styles.borderBottomWidth);
+    const maxHeight = lineHeight * 5 + verticalPadding + verticalBorder;
+    const contentHeight = textarea.scrollHeight + verticalBorder;
+
+    textarea.style.height = `${Math.min(contentHeight, maxHeight)}px`;
+    textarea.style.overflowY = contentHeight > maxHeight ? "auto" : "hidden";
+  }, [input]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,14 +146,17 @@ export function ChatPanel({ uploadedDocument }: ChatPanelProps) {
         )}
 
         {/* Input */}
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
+        <form onSubmit={handleSubmit} className="flex items-end gap-2">
+          <textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask a question about your PDF…"
             maxLength={MAX_QUESTION_LENGTH}
             disabled={isLoading}
-            className="flex-1"
+            rows={1}
+            aria-label="Ask a question about your PDF"
+            className="chat-scrollbar min-h-10 flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-5 ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
           <Button
             type="submit"

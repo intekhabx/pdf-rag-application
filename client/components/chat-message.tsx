@@ -1,6 +1,7 @@
 import { Bot, User, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage } from "@/lib/types";
+import { AgentMessageContent } from "@/components/agent-message-content";
 
 interface ChatMessageItemProps {
   message: ChatMessage;
@@ -39,11 +40,15 @@ export function ChatMessageItem({ message }: ChatMessageItemProps) {
           className={cn(
             "rounded-lg px-3 py-2 text-sm",
             isUser
-              ? "bg-primary text-primary-foreground"
+              ? "whitespace-pre-wrap bg-primary text-primary-foreground"
               : "bg-muted text-foreground",
           )}
         >
-          {message.content}
+          {isUser ? (
+            message.content
+          ) : (
+            <AgentMessageContent content={message.content} />
+          )}
         </div>
 
         {/* Source references (assistant only) */}
