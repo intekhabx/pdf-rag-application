@@ -9,14 +9,11 @@ import type {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-async function watchUploadProgress(
-  jobId: string,
-  token: string,
-  onProgress?: (progress: UploadProgress) => void,
-): Promise<void> {
-  const res = await fetch(`${API_URL}/upload/${encodeURIComponent(jobId)}/events`, {
+async function watchUploadProgress( jobId: string, token: string,onProgress?: (progress: UploadProgress) => void ): Promise<void> {
+
+  const res = await fetch(`${API_URL}/upload-events/${encodeURIComponent(jobId)}`, {
     headers: {
-      "Authorization": `******`
+      "Authorization": `Bearer ${token}`,
     },
     cache: "no-store",
   });
@@ -64,18 +61,17 @@ async function watchUploadProgress(
 
       if (done) break;
     }
-  } finally {
+  } 
+  finally {
     reader.releaseLock();
   }
 
   throw new Error("The PDF processing status stream ended unexpectedly.");
 }
 
-export async function uploadPdf(
-  file: File,
-  token: string,
-  onProgress?: (progress: UploadProgress) => void,
-): Promise<UploadSuccessResponse> {
+
+
+export async function uploadPdf( file: File, token: string, onProgress?: (progress: UploadProgress) => void ): Promise<UploadSuccessResponse> {
 
   // console.log("[uploadPdf] Would POST to:", `${API_URL}/upload`);
   // console.log("[uploadPdf] Form field: pdf");

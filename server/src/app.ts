@@ -43,7 +43,8 @@ export default function expressApplication():Express {
 
 
   
-  app.get("/upload/:jobId/events", async (req, res) => {
+  app.get("/upload-events/:jobId", async (req, res) => {
+
     const job = await fileUploadQueue.getJob(req.params.jobId);
     if (!job) {
       return res.status(404).json({error: "Upload job not found"});

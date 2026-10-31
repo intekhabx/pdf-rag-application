@@ -2,7 +2,7 @@ import { Worker } from 'bullmq';
 import redis from '../config/redis.config.js';
 
 import {PDFLoader} from "@langchain/community/document_loaders/fs/pdf";
-// import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import splitter from '../config/text-splitter.config.js';
 import vectorStore from '../config/qdrant-vector-store.config.js';
 
 
@@ -32,19 +32,26 @@ const worker = new Worker('file-upload-queue', async (job) => {
 
   // step:1. PDF se text extract karo (page by page)
   const loader = new PDFLoader(fileData.path);
-  const docs = await loader.load();
-  // console.log(docs);
+  const docs = await loader.load();  
+  
+  if (docs.length === 0) {
+    throw new Error("No pages found in PDF.");
+  }
+  
+  console.log(`📑Loaded ${docs.length} pages from PDF.`);
 
 
   // step:2. Text ko chunks mein split karo
-  // const splitter = new RecursiveCharacterTextSplitter({
-  //   chunkSize: 1000,
-  //   chunkOverlap: 200
-  // });
-  // const chunks = await splitter.splitDocuments(docs);
-  // console.log(chunks);
-  //! pdf "docs" jo extract h kiye PDFLoader ke through, woh already har page ko alag alag de rha h "docs" array me, to mai ek page ko aur chote-chote tukde me todna nhi chahta
-  //? is liye mai textSplitter ka use nhi kr rha hun
+  //? pdf "docs" jo extract kiye h PDFLoader ke through, woh har page ko alag alag de rha h "docs" array me, woh v pass kr sakte hai embddding ke liye but har page ko v chunk me thod rahe hai
+
+  const chunks = (await splitter.splitDocuments(docs))
+    .filter((c) => c.pageContent.length > 0);
+
+  if (chunks.length === 0) {
+    throw new Error("No extractable text found in PDF (maybe a scanned PDF).");
+  }
+  console.log(`📄Extracted ${chunks.length} text chunks from PDF.`);
+
 
 
   // step:3-4. Embeddings generate karo aur vector DB me store kro
